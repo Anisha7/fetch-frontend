@@ -1,6 +1,25 @@
-# Getting Started with Create React App
+# Fetch Frontend Take Home Exercise
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Features
+-> Api Helpers
+    --> Login API
+    --> Logout API
+    --> Dogs APIs with "include credentials"
+--> Pages
+    --> Auth Page
+        --> Login screen with Name & Email
+    --> Search Page
+        --> Show available dogs
+        --> Filter by breed
+        --> Paginated results
+        --> Sort results by breed. Option to sort ascending/descending
+        --> show all fields except id for each dog in some way
+        --> Add to favorites
+    --> Favorites page
+
+Notes:
+- We can use a component library -> maybe material UI
+- Use provided data models
 
 ## Available Scripts
 
