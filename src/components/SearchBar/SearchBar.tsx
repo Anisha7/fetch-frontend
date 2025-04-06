@@ -1,8 +1,7 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Autocomplete,
   TextField,
-  InputAdornment,
   Chip,
   AutocompleteRenderInputParams,
 } from "@mui/material";
@@ -14,15 +13,11 @@ import {
   ChipsContainer,
   SearchButton,
 } from "./StyledComponents";
+import { DogSearchParams, getDogBreeds } from "../../apis/dogs";
+import { useSearchParams, useNavigate } from "react-router-dom";
 
 // Sample options for breeds and zip codes
-const breedOptions = [
-  "Labrador",
-  "Golden Retriever",
-  "Poodle",
-  "Bulldog",
-  "Beagle",
-];
+
 const zipCodeOptions = ["10001", "90001", "60601", "94101", "33101"];
 
 interface AutocompleteFieldProps {
@@ -32,122 +27,238 @@ interface AutocompleteFieldProps {
   selected: string[];
   onDelete: (value: string) => void;
 }
+
+const ErrorMessage = ({ children }: { children: React.ReactNode }) => (
+  <div style={{ color: 'red', marginTop: '8px', fontSize: '0.875rem' }}>
+    {children}
+  </div>
+);
+
 const AutocompleteField: React.FC<AutocompleteFieldProps> = ({
   options,
   onChange,
   renderInput,
   selected,
   onDelete,
-}) => (
-  <>
-    <Autocomplete
-      multiple
-      options={options}
-      value={selected}
-      onChange={(_, newValue) => onChange(newValue)}
-      renderInput={renderInput}
-      disableClearable
-      forcePopupIcon={false}
-      renderTags={() => null} // Prevents tags from appearing inside the input
-    />
-    {selected.length > 0 && (
-      <ChipsContainer>
-        {selected.map((item: string) => (
-          <Chip key={item} label={item} onDelete={() => onDelete(item)} />
-        ))}
-      </ChipsContainer>
-    )}
-  </>
-);
+}) => {
+  return (
+    <>
+      <Autocomplete
+        multiple
+        options={options}
+        value={selected}
+        onChange={(_, newValue) => onChange(newValue)}
+        renderInput={renderInput}
+        disableClearable
+        forcePopupIcon={false}
+        renderTags={() => null} // Prevents tags from appearing inside the input
+      />
+      {selected.length > 0 && (
+        <ChipsContainer>
+          {selected.map((item: string) => (
+            <Chip key={item} label={item} onDelete={() => onDelete(item)} />
+          ))}
+        </ChipsContainer>
+      )}
+    </>
+  );
+};
 
+// Input fields:
+// breeds - autocomplete, multiple options
+// -> /dogs/breeds we can use for autocomplete here
+// zipCodes - autocomplete, multiple options
+// -> /locations will return 100 zip codes, we can use for autocomplete
+// ageMin - number
+// ageMax - number
 const PetSearchBar: React.FC = () => {
-  const [breeds, setBreeds] = useState<string[]>([]);
-  const [zipCodes, setZipCodes] = useState<string[]>([]);
-  const [ageMin, setAgeMin] = useState<number | null>(null);
-  const [ageMax, setAgeMax] = useState<number | null>(null);
+  const [searchParams, setSearchParams] = useSearchParams();
 
-  const handleSearch = () => {
-    console.log({ breeds, zipCodes, ageMin, ageMax });
-  };
+  // TODO: use searchParams as default values
+  const [breeds, setBreeds] = useState<string[]>([]);
+  const [zipCodes, setZipCodes] = useState<string | undefined>();
+  const [ageMin, setAgeMin] = useState<number | undefined>();
+  const [ageMax, setAgeMax] = useState<number | undefined>();
+
+  const [breedOptions, setBreedOptions] = useState<string[]>([]);
 
   // TODO -> update breedOptions and zipCodeOptions to use from APIs
-  // TODO -> improve design for how selected items are displayed
-    // TODO -> Make it responsive
+  // TODO -> improve design for how selected items are displayed:
+  // maybe the search just has breeds and other things are in filter tab
+  // then breeds can all be inside OR outside the search box (longer box) but align horizontally instead of vertically expanding the input
+  // TODO -> Make it responsive - not sure how this would work
   // TODO -> add selections to URL on search
   // TODO -> design for search button
+  // TODO -> onSubmit search
+
+  useEffect(() => {
+    getDogBreeds()
+      .then((res) => res.json())
+      .then((data) => setBreedOptions(data));
+  }, []);
+
+  const handleAgeMinChange = (value: string) => {
+    const newValue = value === "" ? undefined : Number(value);
+    setAgeMin(newValue);
+    if (newValue !== undefined && ageMax !== undefined && newValue > ageMax) {
+      setAgeMax(undefined);
+    }
+  };
+
+  const handleAgeMaxChange = (value: string) => {
+    const newValue = value === "" ? undefined : Number(value);
+    setAgeMax(newValue);
+    if (newValue !== undefined && ageMin !== undefined && newValue < ageMin) {
+      setAgeMax(undefined);
+    }
+  };
+
+  const handleSearch = () => {
+    const params: Record<string, string | string[]> = {
+      breeds,
+      zipCodes: zipCodes ? [zipCodes] : [],
+    };
+    
+    if (ageMin !== undefined) {
+      params.ageMin = ageMin.toString();
+    }
+    
+    if (ageMax !== undefined && (ageMin === undefined || ageMax > ageMin)) {
+      params.ageMax = ageMax.toString();
+    }
+
+    setSearchParams(params);
+  };
 
   return (
-    <SearchBarContainer>
+    <><SearchBarContainer>
       {/* Breeds Input */}
-      <SearchSection>
+      <SearchSection style={{ flex: 2 }}>
         <SearchLabel>Breeds</SearchLabel>
-        <AutocompleteField
+        <Autocomplete
+          multiple
           options={breedOptions}
-          onChange={setBreeds}
+          value={breeds}
+          onChange={(_, newValue) => setBreeds(newValue)}
           renderInput={(params) => (
             <TextField
               {...params}
               placeholder="Select breeds"
               variant="standard"
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">🐾</InputAdornment>
-                ),
+              sx={{
+                '& .MuiInputBase-root': {
+                  overflowX: 'auto',
+                  '&::-webkit-scrollbar': {
+                    height: '4px'
+                  },
+                  '&::-webkit-scrollbar-thumb': {
+                    backgroundColor: '#888',
+                    borderRadius: '2px'
+                  }
+                }
               }}
             />
           )}
-          selected={breeds}
-          onDelete={(breed) => setBreeds(breeds.filter((b) => b !== breed))}
+          renderTags={(value, getTagProps) =>
+            value.map((option, index) => (
+              <Chip
+                variant="outlined"
+                label={option}
+                size="small"
+                {...getTagProps({ index })}
+              />
+            ))
+          }
         />
       </SearchSection>
 
       {/* Zip Codes Input */}
-      <SearchSection>
+      <SearchSection style={{ flex: 2 }}>
         <SearchLabel>Zip Codes</SearchLabel>
-        <AutocompleteField
+        <TextField
+          type="number"
+          placeholder="Zip Code"
+          variant="standard"
+          value={zipCodes}
+          onChange={(e) => setZipCodes(e.target.value)}
+        />
+        {/* <Autocomplete
+          multiple
           options={zipCodeOptions}
-          onChange={setZipCodes}
+          value={zipCodes}
+          onChange={(_, newValue) => setZipCodes(newValue)}
           renderInput={(params) => (
             <TextField
               {...params}
               placeholder="Enter zip codes"
               variant="standard"
+              sx={{
+                '& .MuiInputBase-root': {
+                  overflowX: 'auto',
+                  '&::-webkit-scrollbar': {
+                    height: '4px'
+                  },
+                  '&::-webkit-scrollbar-thumb': {
+                    backgroundColor: '#888',
+                    borderRadius: '2px'
+                  }
+                }
+              }}
             />
           )}
-          selected={zipCodes}
-          onDelete={(zip) => setZipCodes(zipCodes.filter((z) => z !== zip))}
-        />
+          renderTags={(value, getTagProps) =>
+            value.map((option, index) => (
+              <Chip
+                variant="outlined"
+                label={option}
+                size="small"
+                {...getTagProps({ index })}
+              />
+            ))
+          }
+        /> */}
       </SearchSection>
 
       {/* Age Min Input */}
-      <SearchSection>
+      <SearchSection style={{ flex: 0.5 }}>
         <SearchLabel>Age Min</SearchLabel>
         <TextField
           type="number"
           placeholder="Min age"
           variant="standard"
           value={ageMin ?? ""}
-          onChange={(e) => setAgeMin(Number(e.target.value))}
+          onChange={(e) => handleAgeMinChange(e.target.value)}
         />
       </SearchSection>
 
       {/* Age Max Input */}
-      <SearchSection>
+      <SearchSection style={{ flex: 0.5 }}>
         <SearchLabel>Age Max</SearchLabel>
         <TextField
           type="number"
           placeholder="Max age"
           variant="standard"
           value={ageMax ?? ""}
-          onChange={(e) => setAgeMax(Number(e.target.value))}
+          onChange={(e) => handleAgeMaxChange(e.target.value)}
+          error={ageMax !== undefined && ageMin !== undefined && ageMax < ageMin}
+          inputProps={{
+            min: ageMin || 0,
+            step: 1
+          }}
         />
       </SearchSection>
 
       {/* Search Button */}
-      <SearchButton onClick={handleSearch}>
+      <SearchButton
+        onClick={() => handleSearch()}
+      >
         <SearchIcon />
       </SearchButton>
     </SearchBarContainer>
+    {ageMax !== undefined && ageMin !== undefined && ageMax < ageMin && (
+      <ErrorMessage>Max age must be greater than min age</ErrorMessage>
+    )}
+    </>
   );
 };
 

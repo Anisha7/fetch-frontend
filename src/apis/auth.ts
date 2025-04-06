@@ -1,6 +1,5 @@
+import { API_URL } from ".";
 import { UserInfo } from "../types";
-
-const API_URL = "https://frontend-take-home-service.fetch.com";
 
 // TODO: Add function header comments
 
@@ -8,6 +7,7 @@ export const login = async (props: UserInfo) : Promise<void> => {
   const response = await fetch(`${API_URL}/auth/login`, {
     method: "POST",
     body: JSON.stringify(props),
+    credentials: 'include',
     headers: {
       "Content-Type": "application/json",
     },
