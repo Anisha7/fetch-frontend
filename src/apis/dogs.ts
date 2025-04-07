@@ -1,5 +1,6 @@
 import { API_URL } from ".";
 import { Dog } from "../types";
+import axios from 'axios';
 
 export interface DogSearchParams {
   breeds?: string[];
@@ -34,52 +35,24 @@ export const getDogBreeds = async () =>
 export const searchDogs = async (
   params: DogSearchParams
 ): Promise<DogSearchResponse> => {
-  const queryParams = new URLSearchParams();
-  console.log("searchDogs with: ", params);
+  console.log(params)
+  try {
+    const response = await axios.get(`${API_URL}/dogs/search`, {
+      params: {
+        ...params,
+        sort: params.sort || "breed:asc" // ascending by default
+      },
+      withCredentials: true,
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: "" // Some APIs require this even with cookies
+      }
+    });
 
-  if (params.breeds && params.breeds.length > 0) {
-    params.breeds.forEach((breed) => queryParams.append("breeds", breed));
+    return response.data;
+  } catch (error) {
+    throw new Error(`Failed to fetch dogs: ${error}`);
   }
-
-  if (params.zipCodes && params.zipCodes.length > 0) {
-    params.zipCodes.forEach((zip) => queryParams.append("zipCodes", zip));
-  }
-
-  if (params.ageMin !== undefined && params.ageMin !== null) {
-    queryParams.append("ageMin", params.ageMin.toString());
-  }
-
-  if (params.ageMax !== undefined && params.ageMax !== null) {
-    queryParams.append("ageMax", params.ageMax.toString());
-  }
-
-  if (params.size !== undefined && params.size !== null) {
-    queryParams.append("size", params.size.toString());
-  }
-  if (params.from) queryParams.append("from", params.from.toString());
-  queryParams.append("sort", params.sort || "breed:asc"); // ascending by default
-
-  // search?breeds=Airedale&zipCodes=94101&ageMin=1&ageMax=1
-  // const queryParams = Object.entries(params).filter(([key, value]) => value !== null).flatMap(([key, value]) => {
-  //   return `${key}=${Array.isArray(value) ? value.join('&') : value}`.replaceAll(' ', '+')
-  // }).join('&');
-  console.log("TESTING: ", queryParams.toString());
-
-  const url = `${API_URL}/dogs/search?${queryParams.toString()}`;
-  const response = await fetch(url, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: "", // Some APIs require this even with cookies
-    },
-    credentials: "include",
-  });
-
-  if (!response.ok) {
-    throw new Error(`Failed to fetch dogs: ${response}`);
-  }
-
-  return response.json();
 };
 
 export const fetchDogsById = async (dogs: string[]): Promise<Dog[]> => {

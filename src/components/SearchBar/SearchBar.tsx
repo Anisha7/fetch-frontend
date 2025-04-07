@@ -13,12 +13,9 @@ import {
   ChipsContainer,
   SearchButton,
 } from "./StyledComponents";
-import { DogSearchParams, getDogBreeds } from "../../apis/dogs";
-import { useSearchParams, useNavigate } from "react-router-dom";
+import { getDogBreeds } from "../../apis/dogs";
+import { useSearchParams } from "react-router-dom";
 
-// Sample options for breeds and zip codes
-
-const zipCodeOptions = ["10001", "90001", "60601", "94101", "33101"];
 
 interface AutocompleteFieldProps {
   options: string[];
@@ -74,22 +71,23 @@ const AutocompleteField: React.FC<AutocompleteFieldProps> = ({
 const PetSearchBar: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
 
-  // TODO: use searchParams as default values
-  const [breeds, setBreeds] = useState<string[]>([]);
-  const [zipCodes, setZipCodes] = useState<string | undefined>();
-  const [ageMin, setAgeMin] = useState<number | undefined>();
-  const [ageMax, setAgeMax] = useState<number | undefined>();
+  const [breeds, setBreeds] = useState<string[]>(searchParams.getAll('breeds') || []);
+  const [zipCodes, setZipCodes] = useState<string | undefined>(
+    searchParams.get('zipCodes') || undefined
+  );
+  const [ageMin, setAgeMin] = useState<number | undefined>(
+    searchParams.get('ageMin') ? Number(searchParams.get('ageMin')) : undefined
+  );
+  const [ageMax, setAgeMax] = useState<number | undefined>(
+    searchParams.get('ageMax') ? Number(searchParams.get('ageMax')) : undefined
+  );
 
   const [breedOptions, setBreedOptions] = useState<string[]>([]);
 
-  // TODO -> update breedOptions and zipCodeOptions to use from APIs
   // TODO -> improve design for how selected items are displayed:
   // maybe the search just has breeds and other things are in filter tab
   // then breeds can all be inside OR outside the search box (longer box) but align horizontally instead of vertically expanding the input
   // TODO -> Make it responsive - not sure how this would work
-  // TODO -> add selections to URL on search
-  // TODO -> design for search button
-  // TODO -> onSubmit search
 
   useEffect(() => {
     getDogBreeds()

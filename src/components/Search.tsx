@@ -132,13 +132,10 @@ const Results: React.FC = () => {
     ageMax: Number(searchParams.get('ageMax')) || undefined,
   });
 
-  console.log(searchParams.toString());
-
   useEffect(() => {
-    console.log("HERE: ", searchParams.toString())
     searchDogs({
       size: itemsPerPage,
-      from: page*itemsPerPage,
+      from: (page*itemsPerPage) - itemsPerPage,
       ...getAllParams(),
     })
       .then((data) => setData(() => data)); 
