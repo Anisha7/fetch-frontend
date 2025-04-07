@@ -1,6 +1,6 @@
 import { API_URL } from ".";
 import { Dog } from "../types";
-import axios from 'axios';
+import axios from "axios";
 
 export interface DogSearchParams {
   breeds?: string[];
@@ -26,6 +26,10 @@ export interface DogSearchResponse {
   prev?: string; // Query string for the previous page (if available)
 }
 
+export interface Match {
+  match: string;
+}
+
 export const getDogBreeds = async () =>
   await fetch(`${API_URL}/dogs/breeds`, {
     credentials: "include",
@@ -35,18 +39,18 @@ export const getDogBreeds = async () =>
 export const searchDogs = async (
   params: DogSearchParams
 ): Promise<DogSearchResponse> => {
-  console.log(params)
+  console.log(params);
   try {
     const response = await axios.get(`${API_URL}/dogs/search`, {
       params: {
         ...params,
-        sort: params.sort || "breed:asc" // ascending by default
+        sort: params.sort || "breed:asc", // ascending by default
       },
       withCredentials: true,
       headers: {
         "Content-Type": "application/json",
-        Authorization: "" // Some APIs require this even with cookies
-      }
+        Authorization: "", // Some APIs require this even with cookies
+      },
     });
 
     return response.data;
@@ -74,4 +78,19 @@ export const fetchDogsById = async (dogs: string[]): Promise<Dog[]> => {
   return response.json();
 };
 
-// dogs match api
+export const matchDog = async (dogs: string[]): Promise<Match> => {
+  const response = await fetch(`${API_URL}/dogs/match`, {
+    method: "POST",
+    body: JSON.stringify(dogs),
+    headers: {
+      "Content-Type": "application/json",
+    },
+    credentials: "include",
+  });
+
+  if (!response.ok) {
+    throw new Error(`Match request failed with status: ${response.status}`);
+  }
+
+  return response.json();
+};

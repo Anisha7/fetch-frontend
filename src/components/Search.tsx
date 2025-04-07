@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import PetSearchBar from "./SearchBar/SearchBar";
 import {
   Box,
@@ -12,11 +12,11 @@ import {
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import { DogSearchParams, DogSearchResponse, fetchDogsById, searchDogs } from "../apis/dogs";
+import { searchLocations, getLocations } from "../apis/locations";
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { Dog, Location } from "../types";
 import { GoogleMap, LoadScript, Marker, InfoWindow } from '@react-google-maps/api';
 
-// Styled Components
 const ListingsContainer = styled(Box)(({ theme }) => ({
   padding: theme.spacing(2),
   height: "100vh",
@@ -39,8 +39,13 @@ const StyledCard = styled(Card)({
 const DogMap: React.FC<{
   dogs: Dog[];
   locations: Location[];
-}> = ({ dogs, locations }) => {
+  onBoundsChanged: (bounds: google.maps.LatLngBounds) => void;
+  initialBounds?: google.maps.LatLngBounds;
+}> = ({ dogs, locations, onBoundsChanged, initialBounds }) => {
   const [selectedDog, setSelectedDog] = useState<Dog | null>(null);
+  const [map, setMap] = useState<google.maps.Map | null>(null);
+  const boundsTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const hasInitializedRef = useRef(false);
 
   const center = {
     lat: 39.8283,
@@ -57,13 +62,48 @@ const DogMap: React.FC<{
     return location ? { lat: location.latitude, lng: location.longitude } : null;
   };
 
+  const onLoad = (map: google.maps.Map) => {
+    setMap(map);
+    if (initialBounds && !hasInitializedRef.current) {
+      map.fitBounds(initialBounds);
+      const listener = google.maps.event.addListener(map, 'zoom_changed', () => {
+        if (map.getZoom()! > 12) {
+          map.setZoom(12);
+        }
+      });
+      hasInitializedRef.current = true;
+    }
+  };
+
+  // Add effect to handle initialBounds changes
+  useEffect(() => {
+    if (map && initialBounds && !hasInitializedRef.current) {
+      map.fitBounds(initialBounds);
+      hasInitializedRef.current = true;
+    }
+  }, [map, initialBounds]);
+
+  const onIdle = useCallback(() => {
+    if (boundsTimeoutRef.current) {
+      clearTimeout(boundsTimeoutRef.current);
+    }
+
+    boundsTimeoutRef.current = setTimeout(() => {
+      const bounds = map && map.getBounds();
+      if (bounds) {
+        onBoundsChanged(bounds);
+      }
+    }, 500);
+  }, [map, onBoundsChanged]);
+
   return (
-    // TODO: Get API KEY & add to env
     <LoadScript googleMapsApiKey={process.env.REACT_APP_GOOGLE_MAPS_API_KEY || ''}>
       <GoogleMap
         mapContainerStyle={mapStyles}
-        zoom={4}
+        zoom={9}
         center={center}
+        onLoad={onLoad}
+        onIdle={onIdle}
       >
         {dogs.map((dog) => {
           const position = getDogLocation(dog);
@@ -116,7 +156,11 @@ const Results: React.FC = () => {
   const [dogs, setDogs] = useState<Dog[]>([]);
   const [locations, setLocations] = useState<Location[]>([]);
   const [searchParams, setSearchParams] = useSearchParams();
+  const [isLoading, setIsLoading] = useState(false);
+  const [initialBounds, setInitialBounds] = useState<google.maps.LatLngBounds | null>(null);
   const itemsPerPage = 25;
+  const lastBoundsRef = useRef<google.maps.LatLngBounds | null>(null);
+  const isInitialLoadRef = useRef(true);
 
   const handlePageChange = (
     _event: React.ChangeEvent<unknown>,
@@ -125,25 +169,114 @@ const Results: React.FC = () => {
     setPage(value);
   };
 
-  const getAllParams = () => ({
+  const getAllParams = useCallback(() => ({
     breeds: searchParams.getAll('breeds'),
     zipCodes: searchParams.getAll('zipCodes'),
     ageMin: Number(searchParams.get('ageMin')) || undefined,
     ageMax: Number(searchParams.get('ageMax')) || undefined,
-  });
+  }), [searchParams]);
+
+  const handleBoundsChanged = useCallback(async (bounds: google.maps.LatLngBounds) => {
+    if (!isInitialLoadRef.current) {
+      if (lastBoundsRef.current) {
+        const ne = bounds.getNorthEast();
+        const sw = bounds.getSouthWest();
+        const lastNe = lastBoundsRef.current.getNorthEast();
+        const lastSw = lastBoundsRef.current.getSouthWest();
+
+        if (
+          Math.abs(ne.lat() - lastNe.lat()) < 0.1 &&
+          Math.abs(ne.lng() - lastNe.lng()) < 0.1 &&
+          Math.abs(sw.lat() - lastSw.lat()) < 0.1 &&
+          Math.abs(sw.lng() - lastSw.lng()) < 0.1
+        ) {
+          return;
+        }
+      }
+
+      if (isLoading) return;
+      setIsLoading(true);
+      lastBoundsRef.current = bounds;
+
+      try {
+        const ne = bounds.getNorthEast();
+        const sw = bounds.getSouthWest();
+        
+        const locations = await searchLocations({
+          geoBoundingBox: {
+            top: ne.lat(),
+            bottom: sw.lat(),
+            left: sw.lng(),
+            right: ne.lng(),
+          }
+        });
+        
+        setLocations(locations?.results);
+        
+        if (locations.total > 0) {
+          const zipCodes = locations.results.map(loc => loc.zip_code);
+          const searchData = await searchDogs({
+            size: itemsPerPage,
+            from: 0,
+            ...getAllParams(),
+            zipCodes,
+          });
+          
+          setData(searchData);
+          if (searchData.resultIds.length > 0) {
+            const dogsData = await fetchDogsById(searchData.resultIds);
+            setDogs(dogsData);
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+  }, [getAllParams, isLoading]);
 
   useEffect(() => {
-    searchDogs({
-      size: itemsPerPage,
-      from: (page*itemsPerPage) - itemsPerPage,
-      ...getAllParams(),
-    })
-      .then((data) => setData(() => data)); 
-  }, [page, searchParams.toString()]);
+    const fetchData = async () => {
+      try {
+        const zipCodes = searchParams.getAll('zipCodes');
+        if (zipCodes.length > 0) {
+          const locations = await getLocations(zipCodes);
+          setLocations(locations);
+          
+          if (locations.length > 0) {
+            const bounds = new google.maps.LatLngBounds();
+            locations.forEach(loc => {
+              bounds.extend({ lat: loc.latitude, lng: loc.longitude });
+            });
+            setInitialBounds(bounds);
+            
+            const searchData = await searchDogs({
+              size: itemsPerPage,
+              from: (page*itemsPerPage) - itemsPerPage,
+              ...getAllParams(),
+            });
+            setData(searchData);
+          }
+        } else {
+          const searchData = await searchDogs({
+            size: itemsPerPage,
+            from: (page*itemsPerPage) - itemsPerPage,
+            ...getAllParams(),
+          });
+          setData(searchData);
+        }
+      } catch (error) {
+        console.error('Error fetching search data:', error);
+      }
+    };
+    
+    fetchData();
+  }, [page, searchParams.toString(), getAllParams]);
 
   useEffect(() => {
     if (data?.resultIds && data?.resultIds.length > 0) {
-      fetchDogsById(data?.resultIds as string[]).then((res) => setDogs(res))
+      fetchDogsById(data?.resultIds as string[]).then(setDogs);
     }
   }, [data?.resultIds]);
 
@@ -190,7 +323,12 @@ const Results: React.FC = () => {
       </ListingsContainer>
       
       <MapContainer>
-        <DogMap dogs={dogs} locations={locations} />
+        <DogMap 
+          dogs={dogs} 
+          locations={locations} 
+          onBoundsChanged={handleBoundsChanged}
+          initialBounds={initialBounds || undefined}
+        />
       </MapContainer>
     </Box>
   );
@@ -206,34 +344,3 @@ const Search: React.FC = () => {
 };
 
 export default Search;
-// Show search page here
-// we want to here fetch all the dogs
-// show paginated result of all the dogs
-// have a search bar
-// call search api and update shown result
-// a button to sort ascending/descending (FontAwesomeIcon)
-
-// We can build a separate filter component
-// here fetch all the dog breeds
-// this can be a side menu or a dropdown menu, find a good design
-
-// Helper component to show a Dog
-// we can have it click to open "info" for the dog
-// see where to add a favorites option
-// like giphy or dribbble
-
-// Redux Store Setup
-// we probably want a store to save favorites
-// do we want to also store the dogs and breeds so it doesn't have to fetch again? Might be hard on memory though if not needed
-// maybe just store breeds?
-
-// Design Notes
-// We should build a map view like zillow
-// on the right, show all options resulting from the search from general search input fields
-// we can display these on the map, with the map zoomed out to the search's bounding box
-
-// If the user moves the map around or zooms in, we can call /locations/search to the given bounding box
-// we do want to limit the size here so it doesn't take too much loading time
-// -> this will return Location objects, and then we can call the /dogs/search api with those zipcodes
-// // along with the previous breeds and age filters to update results
-// and we add markers for this on the map
