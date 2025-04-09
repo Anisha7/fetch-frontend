@@ -20,6 +20,12 @@ export interface Coordinates {
     lon: number;
 }
 
+export interface MapCoordinates {
+    lat: number;
+    lng: number;
+}
+
+
 export interface UserInfo {
     name: string;
     email: string;
