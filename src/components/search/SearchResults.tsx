@@ -5,8 +5,8 @@ import { DogSearchResponse, fetchDogsById, searchDogs } from "../../apis/dogs";
 import { searchLocations, getLocations } from "../../apis/locations";
 import { useSearchParams } from "react-router-dom";
 import { Dog, Location, MapCoordinates } from "../../types";
-import DogMap from "../Map/DogMap";
-import DogCard from "../DogCard/DogCard";
+import DogMap from "./Map";
+import DogCard from "../dog/DogCard";
 
 const ListingsContainer = styled(Box)(({ theme }) => ({
   padding: theme.spacing(2),

@@ -1,9 +1,9 @@
 import React from "react";
-import PetSearchBar from "./SearchBar/SearchBar";
+import PetSearchBar from "../search/SearchBar";
 import { Box } from "@mui/material";
 import { styled } from "@mui/material/styles";
-import GenerateMatchButton from "./GenerateMatch/GenerateMatch";
-import SearchResults from "./SearchResults/SearchResults";
+import GenerateMatchButton from "../match/GenerateMatch";
+import SearchResults from "../search/SearchResults";
 
 const SearchContainer = styled(Box)(({ theme }) => ({
   position: 'relative',

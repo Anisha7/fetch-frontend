@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { searchDogs } from "../../apis/dogs";
-import LogoutButton from "../LogoutButton/LogoutButton";
+import LogoutButton from "./LogoutButton";
 import { Box } from "@mui/material";
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import "./App.css";
-import Login from "./components/Auth/Login";
+import Login from "./components/pages/Login";
 import {
   createTheme,
   ThemeProvider,
@@ -9,8 +9,8 @@ import {
   Typography,
   styled,
 } from "@mui/material";
-import Search from "./components/Search";
-import ProtectedRoute from "./components/ProtectedRoute/ProtectedRoute";
+import Search from "./components/pages/Search";
+import ProtectedRoute from "./components/layout/ProtectedRoute";
 
 const theme = createTheme({
   palette: {

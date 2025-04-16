@@ -2,7 +2,32 @@ import { Button, TextField } from "@mui/material";
 import React, { useState } from "react";
 import { login } from "../../apis/auth";
 import { useNavigate } from "react-router-dom";
-import { LoginContainer, PageContainer } from "./StyledComponents";
+import { Box, styled } from "@mui/material";
+import AnimatedDog from "../dog/AnimatedDog";
+
+export const PageContainer = styled(Box)(() => ({
+  borderRadius: 8,
+  width: "100vw",
+  height: "100vh",
+  // Center styles
+  display: "flex",
+  flexDirection: "column",
+  alignItems: "center",
+  justifyContent: "center",
+  textAlign: "center",
+}));
+
+export const LoginContainer = styled(Box, {
+  shouldForwardProp: (prop) => prop !== "component",
+})(({ theme }) => ({
+  padding: theme.spacing(2),
+  borderRadius: 8,
+  transition: "all 0.3s ease",
+  "& > *": {
+    textAlign: "center",
+    margin: "10px !important",
+  },
+}));
 
 const Login: React.FC = () => {
   const navigate = useNavigate();
@@ -47,6 +72,7 @@ const Login: React.FC = () => {
 
   return (
     <PageContainer>
+      <AnimatedDog />
       <LoginContainer as="form" onSubmit={onSubmit}>
         <TextField
           required
