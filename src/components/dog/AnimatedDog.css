@@ -10,7 +10,7 @@
     --ear-inner: #6b6b6b;
   }
   
-  body {
+  /* body {
     margin: 0;
     padding: 0;
     background: transparent;
@@ -18,7 +18,7 @@
     justify-content: center;
     align-items: center;
     height: 100vh;
-  }
+  } */
   
   .dog-container {
     position: relative;

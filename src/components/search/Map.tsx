@@ -9,9 +9,9 @@ import { styled } from "@mui/material/styles";
 import { Dog, MapCoordinates } from "../../types";
 import {
   GoogleMap,
-  LoadScript,
   Marker,
   InfoWindow,
+  useJsApiLoader,
 } from "@react-google-maps/api";
 
 
@@ -30,6 +30,9 @@ const DogMap: React.FC<{
     const [map, setMap] = useState<google.maps.Map | null>(null);
     const boundsTimeoutRef = useRef<NodeJS.Timeout | null>(null);
     const hasInitializedRef = useRef(false);
+    const { isLoaded } = useJsApiLoader({
+      googleMapsApiKey: process.env.REACT_APP_GOOGLE_MAPS_API_KEY || "",
+    });
   
     const center = {
       lat: 39.8283,
@@ -77,10 +80,12 @@ const DogMap: React.FC<{
       }
     };
   
+    if (!isLoaded) return <p>Loading map...</p>;
+    
     return (
-      <LoadScript
-        googleMapsApiKey={process.env.REACT_APP_GOOGLE_MAPS_API_KEY || ""}
-      >
+      // <LoadScript
+      //   googleMapsApiKey={process.env.REACT_APP_GOOGLE_MAPS_API_KEY || ""}
+      // >
         <GoogleMap
           mapContainerStyle={mapStyles}
           zoom={3}
@@ -136,7 +141,7 @@ const DogMap: React.FC<{
             </InfoWindow>
           )}
         </GoogleMap>
-      </LoadScript>
+      // </LoadScript>
     );
   };
 
