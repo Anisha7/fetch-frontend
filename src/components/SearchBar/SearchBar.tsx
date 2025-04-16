@@ -171,8 +171,8 @@ const PetSearchBar: React.FC = () => {
       </SearchSection>
 
       {/* Zip Codes Input */}
-      <SearchSection style={{ flex: 2 }}>
-        <SearchLabel>Zip Codes</SearchLabel>
+      <SearchSection style={{ flex: 1 }}>
+        <SearchLabel>Zip Code</SearchLabel>
         <TextField
           type="number"
           placeholder="Zip Code"
@@ -180,41 +180,6 @@ const PetSearchBar: React.FC = () => {
           value={zipCodes}
           onChange={(e) => setZipCodes(e.target.value)}
         />
-        {/* <Autocomplete
-          multiple
-          options={zipCodeOptions}
-          value={zipCodes}
-          onChange={(_, newValue) => setZipCodes(newValue)}
-          renderInput={(params) => (
-            <TextField
-              {...params}
-              placeholder="Enter zip codes"
-              variant="standard"
-              sx={{
-                '& .MuiInputBase-root': {
-                  overflowX: 'auto',
-                  '&::-webkit-scrollbar': {
-                    height: '4px'
-                  },
-                  '&::-webkit-scrollbar-thumb': {
-                    backgroundColor: '#888',
-                    borderRadius: '2px'
-                  }
-                }
-              }}
-            />
-          )}
-          renderTags={(value, getTagProps) =>
-            value.map((option, index) => (
-              <Chip
-                variant="outlined"
-                label={option}
-                size="small"
-                {...getTagProps({ index })}
-              />
-            ))
-          }
-        /> */}
       </SearchSection>
 
       {/* Age Min Input */}

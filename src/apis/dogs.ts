@@ -39,7 +39,6 @@ export const getDogBreeds = async () =>
 export const searchDogs = async (
   params: DogSearchParams
 ): Promise<DogSearchResponse> => {
-  console.log(params);
   try {
     const response = await axios.get(`${API_URL}/dogs/search`, {
       params: {

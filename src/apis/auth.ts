@@ -19,7 +19,7 @@ export const login = async (props: UserInfo) : Promise<void> => {
 }
   
 
-export const logout = async (props: UserInfo) =>
+export const logout = async () =>
   await fetch(`${API_URL}/auth/logout`, {
     credentials: "include",
   });
