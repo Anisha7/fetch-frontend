@@ -44,8 +44,6 @@ const MobileMessage = styled(Box)(({ theme }) => ({
   textAlign: "center",
 }));
 
-// TODO: navbar with Logout/login button
-// TODO: cute svg dog animation
 function App() {
   const [isMobile, setIsMobile] = useState(false);
 
@@ -79,11 +77,9 @@ function App() {
   return (
     <div className="App">
       <ThemeProvider theme={theme}>
-        <Router>
+        <Router basename="/fetch-frontend">
           <Routes>
             <Route path="/" element={<Login />} />
-            {/* Make below a ProtectedRoute -> if no auth key, user should not be able to go here. 
-            Either show an Error page "You must login to access this page. With login button" or redirect to Login  */}
             <Route path="/search" element={<ProtectedRoute><Search /></ProtectedRoute>} />
           </Routes>
         </Router>
