@@ -3,7 +3,15 @@ import { useNavigate } from "react-router-dom";
 import { searchDogs } from "../../apis/dogs";
 import LogoutButton from "./LogoutButton";
 import { Box } from "@mui/material";
+import { handleLogoutAndRedirect } from "../../utils/auth";
 
+/**
+ * ProtectedRoute is a wrapper component that checks if the user is authenticated
+ * before rendering protected child components. If not authorized, it clears favorites
+ * and redirects the user to the login page.
+ *
+ * @param children - React children to render if the user is authenticated.
+ */
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const [checking, setChecking] = useState(true);
   const [authorized, setAuthorized] = useState(false);
@@ -20,10 +28,10 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
         if (res) {
           setAuthorized(true);
         } else {
-          navigate("/", { replace: true });
+          handleLogoutAndRedirect(navigate);
         }
       } catch (e) {
-        navigate("/", { replace: true });
+        handleLogoutAndRedirect(navigate);
       } finally {
         setChecking(false);
       }

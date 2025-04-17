@@ -1,24 +1,21 @@
-// components/LogoutButton.tsx
 import React from "react";
 import { IconButton, Tooltip } from "@mui/material";
 import ExitToAppIcon from "@mui/icons-material/ExitToApp";
 import { useNavigate } from "react-router-dom";
-import { logout } from "../../apis/auth";
+import { handleLogoutAndRedirect } from "../../utils/auth";
 
+/**
+ * LogoutButton is a floating icon button that triggers user logout.
+ * It clears the auth session and any locally stored favorite dogs,
+ * then redirects the user to the login page.
+ */
 const LogoutButton = () => {
   const navigate = useNavigate();
-
-  const handleLogout = async () => {
-    // Cookies.remove("isLoggedIn"); // Optional: if you’re still setting this
-    // Auth cookie will expire anyway — redirecting is enough
-    await logout();
-    navigate("/", { replace: true });
-  };
 
   return (
     <Tooltip title="Logout">
       <IconButton
-        onClick={handleLogout}
+        onClick={() => handleLogoutAndRedirect(navigate)}
         sx={{
           position: "absolute",
           top: 16,

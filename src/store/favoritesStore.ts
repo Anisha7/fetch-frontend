@@ -1,5 +1,3 @@
-// src/store/favoritesStore.ts
-
 /**
  * We are using `localStorage` instead of Redux because this is a simple use case
  * where we just need to persist a list of favorite dog IDs across sessions.
@@ -41,4 +39,11 @@ export function removeFavoriteDog(dogId: string): void {
   const favorites = new Set(getFavoriteDogs());
   favorites.delete(dogId);
   localStorage.setItem(STORAGE_KEY, JSON.stringify(Array.from(favorites)));
+}
+
+/**
+ * Remove a dog ID from the list of favorites
+ */
+export function removeFavorites(): void {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify([]));
 }

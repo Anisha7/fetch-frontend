@@ -1,4 +1,3 @@
-// components/ui/DogAnimation.tsx
 import React from "react";
 import "./AnimatedDog.css";
 

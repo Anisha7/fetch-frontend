@@ -13,10 +13,6 @@ import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import { addFavoriteDog, removeFavoriteDog, getFavoriteDogs } from "../../store/favoritesStore";
 import { styled } from "@mui/material/styles";
 
-const StyledCard = styled(Card)({
-  position: "relative",
-});
-
 interface DogListing {
   id: string;
   name: string;
@@ -30,14 +26,27 @@ interface DogCardProps {
   listing: DogListing;
 }
 
+const StyledCard = styled(Card)({
+  position: "relative",
+});
+
+/**
+ * DogCard component displays individual dog information in a card layout,
+ * including name, breed, age, and zip code. It also includes a toggleable
+ * favorite button that updates localStorage and UI state.
+ *
+ * @param listing - DogListing object containing metadata for one dog.
+ */
 const DogCard: React.FC<DogCardProps> = ({ listing }) => {
   const [isFavorite, setIsFavorite] = useState(false);
 
+  // On mount or when the dog ID changes, check if the current dog is already a favorite
   useEffect(() => {
     const favorites = getFavoriteDogs();
     setIsFavorite(favorites.includes(listing.id));
   }, [listing.id]);
 
+  // Toggles the favorite state of the current dog and updates localStorage
   const toggleFavorite = () => {
     if (isFavorite) {
       removeFavoriteDog(listing.id);

@@ -30,12 +30,25 @@ export interface Match {
   match: string;
 }
 
+/**
+ * Fetches a list of all available dog breeds from the API.
+ * Includes credentials for session-based authentication.
+ *
+ * @returns A Promise resolving to the fetch response.
+ */
 export const getDogBreeds = async () =>
   await fetch(`${API_URL}/dogs/breeds`, {
     credentials: "include",
   });
 
-// Filters dogs by search results
+/**
+ * Searches for dogs based on filter parameters including breed, zip code, age, etc.
+ * Sorts results in ascending order of breed by default.
+ *
+ * @param params - Filters and pagination options for the search query.
+ * @returns A Promise resolving to a DogSearchResponse object.
+ * @throws Error if the API call fails.
+ */
 export const searchDogs = async (
   params: DogSearchParams
 ): Promise<DogSearchResponse> => {
@@ -58,6 +71,14 @@ export const searchDogs = async (
   }
 };
 
+/**
+ * Fetches detailed dog objects given a list of dog IDs.
+ * Throws an error if more than 100 IDs are provided.
+ *
+ * @param dogs - An array of dog ID strings to fetch.
+ * @returns A Promise resolving to an array of Dog objects.
+ * @throws Error if the response is not successful or the input size exceeds 100.
+ */
 export const fetchDogsById = async (dogs: string[]): Promise<Dog[]> => {
   if (dogs?.length > 100)
     throw new Error("dogs request must have less than 100 ids");
@@ -77,6 +98,13 @@ export const fetchDogsById = async (dogs: string[]): Promise<Dog[]> => {
   return response.json();
 };
 
+/**
+ * Sends a list of favorited dog IDs to the match endpoint to receive a single best match.
+ *
+ * @param dogs - An array of dog ID strings the user has favorited.
+ * @returns A Promise resolving to a Match object containing the matched dog ID.
+ * @throws Error if the match request fails.
+ */
 export const matchDog = async (dogs: string[]): Promise<Match> => {
   const response = await fetch(`${API_URL}/dogs/match`, {
     method: "POST",

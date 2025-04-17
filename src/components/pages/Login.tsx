@@ -1,15 +1,20 @@
-import { Button, TextField } from "@mui/material";
 import React, { useState } from "react";
+import {
+  Button,
+  TextField,
+  Box,
+  Typography,
+} from "@mui/material";
 import { login } from "../../apis/auth";
 import { useNavigate } from "react-router-dom";
-import { Box, styled } from "@mui/material";
+import { styled } from "@mui/material/styles";
 import AnimatedDog from "../dog/AnimatedDog";
 
+// Container for full-screen centered layout
 export const PageContainer = styled(Box)(() => ({
   borderRadius: 8,
   width: "100vw",
   height: "100vh",
-  // Center styles
   display: "flex",
   flexDirection: "column",
   alignItems: "center",
@@ -17,6 +22,7 @@ export const PageContainer = styled(Box)(() => ({
   textAlign: "center",
 }));
 
+// Container for the login form
 export const LoginContainer = styled(Box, {
   shouldForwardProp: (prop) => prop !== "component",
 })(({ theme }) => ({
@@ -29,22 +35,27 @@ export const LoginContainer = styled(Box, {
   },
 }));
 
+/**
+ * Login component that captures user name and email, validates input,
+ * and initiates authentication via the login API.
+ * Displays animated dog, handles errors, and redirects to the search page on success.
+ */
 const Login: React.FC = () => {
   const navigate = useNavigate();
 
-  // State Variables
+  // === 🧠 Form State ===
   const [name, setName] = useState<string>("");
   const [email, setEmail] = useState<string>("");
-  // TODO: RENAME + THINK BETTER ORGANIZATION
   const [hasError, setHasError] = useState<boolean>(false);
-  const [submitError, setSubmitError] = useState<string|null>(null);
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
+  // Redirects to search page after successful login
   const handleRedirectOnLogin = () => {
-    navigate("/search")
-  }
+    navigate("/search");
+  };
 
+  // Validates and submits login form
   const onSubmit = async (e: React.FormEvent) => {
-    // Prevent page reload
     e.preventDefault();
 
     if (!isValidEmail(email)) {
@@ -52,21 +63,18 @@ const Login: React.FC = () => {
       return;
     }
 
-    // Submit to Login API
     try {
-      // Saves auth key automatically
-      await login({ name, email })
-      // Redirect if successful
+      await login({ name, email });
       handleRedirectOnLogin();
     } catch (err) {
-      // TODO: Add error handling
-      setSubmitError("Login Failed. Please try again!")
+      setSubmitError("Login Failed. Please try again!");
     }
   };
 
+  // Basic email validation regex
   const isValidEmail = (email: string): boolean => {
     const re =
-      /^(([^<>()[\]\.,;:\s@\"]+(\.[^<>()[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i;
+      /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@(([^<>()[\]\\.,;:\s@"]+\.)+[^<>()[\]\\.,;:\s@"]{2,})$/i;
     return Boolean(email.match(re));
   };
 
@@ -95,8 +103,13 @@ const Login: React.FC = () => {
           error={hasError}
           placeholder="example@gmail.com"
         />
-        {/* TODO: STYLE SUBMIT ERROR HERE  */}
-        {submitError && <p>{submitError}</p>}
+
+        {submitError && (
+          <Typography color="error" fontSize="0.875rem">
+            {submitError}
+          </Typography>
+        )}
+
         <Button type="submit" variant="contained" color="primary" fullWidth>
           Enter
         </Button>

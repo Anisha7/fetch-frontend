@@ -16,17 +16,24 @@ import CloseIcon from "@mui/icons-material/Close";
 import { getFavoriteDogs } from "../../store/favoritesStore";
 import { matchDog, fetchDogsById } from "../../apis/dogs";
 
+/**
+ * GenerateMatchButton allows users to find their best dog match based on favorites.
+ * It fetches a match from the server and displays it in a modal.
+ * If no favorites are selected, it informs the user accordingly.
+ */
 const GenerateMatchButton: React.FC = () => {
   const [open, setOpen] = useState(false);
   const [match, setMatch] = useState<any>(null);
   const [loading, setLoading] = useState(false);
   const [noFavorites, setNoFavorites] = useState(false);
 
+  // Handles the button click to find a dog match
   const handleMatchClick = async () => {
     setLoading(true);
     setMatch(null);
     const favoriteIds = getFavoriteDogs();
 
+    // If user has no favorites, show info dialog
     if (favoriteIds.length === 0) {
       setNoFavorites(true);
       setOpen(true);
@@ -35,6 +42,7 @@ const GenerateMatchButton: React.FC = () => {
     }
 
     try {
+      // Fetch matched dog ID and then get full dog details
       const { match } = await matchDog(favoriteIds);
       const dogDetails = await fetchDogsById([match]);
       setMatch(dogDetails[0]);
@@ -47,6 +55,7 @@ const GenerateMatchButton: React.FC = () => {
     }
   };
 
+  // Resets state and closes the dialog
   const handleClose = () => {
     setOpen(false);
     setMatch(null);

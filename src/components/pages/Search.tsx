@@ -5,28 +5,33 @@ import { styled } from "@mui/material/styles";
 import GenerateMatchButton from "../match/GenerateMatch";
 import SearchResults from "../search/SearchResults";
 
+// Container for search bar layout, centers it horizontally
 const SearchContainer = styled(Box)(({ theme }) => ({
   position: 'relative',
   width: '100%',
   display: 'flex',
   alignItems: 'center',
-  justifyContent: 'center'
+  justifyContent: 'center',
 }));
 
-// TODO: On smaller screens where width is less than 900px, place the button with these styles: float: right;
-    // top: 130px;
-    // position: absolute;
+// Positioning wrapper for the Generate Match button
 const ButtonContainer = styled(Box)(({ theme }) => ({
   position: 'absolute',
   right: 20,
   zIndex: 1,
-  // Responsive overrides
+  // On smaller screens, float button below navbar
   [theme.breakpoints.down('md')]: {
     float: 'right',
     top: 130,
   },
 }));
 
+/**
+ * Search page component that renders:
+ * - A responsive search bar for filtering dogs
+ * - A floating match button to generate a dog match from favorites
+ * - The main search results with dog cards and an interactive map
+ */
 const Search: React.FC = () => {
   return (
     <>
