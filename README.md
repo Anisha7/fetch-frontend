@@ -1,65 +1,104 @@
-# Fetch Frontend Take Home Exercise
+# 🐶 Fetch Frontend Take Home – Anisha Jain
 
-Features
--> Api Helpers
-    --> Login API
-    --> Logout API
-    --> Dogs APIs with "include credentials"
---> Pages
-    --> Auth Page
-        --> Login screen with Name & Email
-    --> Search Page
-        --> Show available dogs
-        --> Filter by breed
-        --> Paginated results
-        --> Sort results by breed. Option to sort ascending/descending
-        --> show all fields except id for each dog in some way
-        --> Add to favorites
-    --> Favorites page
+**Live Demo:** [https://anisha7.github.io/fetch-frontend/](https://anisha7.github.io/fetch-frontend/)
 
-Notes:
-- We can use a component library -> maybe material UI
-- Use provided data models
+This project is my solution to the [Fetch Frontend Take Home Assignment](https://frontend-take-home.fetch.com/), a full-stack React application that allows users to authenticate, search for adoptable dogs, filter and paginate results, favorite dogs, and receive a perfect match—all powered by Fetch's APIs.
 
-## Available Scripts
+---
 
-In the project directory, you can run:
+## ✨ Features Implemented
+
+### ✅ Authentication
+
+- Login via Name & Email
+- Auth cookie handled securely using `credentials: include`
+
+### 🐕 Dog Search Page
+
+- Search and display adoptable dogs
+- Filter by **breed**, **zip code**, and **age range**
+- **Pagination** of results
+- **Sorting** by breed (ascending/descending)
+- Display all dog fields (except ID) with clean UI
+- Add/Remove **Favorites** with heart icon
+- View dog locations on **interactive Google Map**
+- Click marker to view dog details
+
+### ❤️ Favorites Page
+
+- View all dogs added to favorites
+- Easily revisit favorites across sessions (via localStorage)
+
+### 🎯 Matching Feature
+
+- Generate a match based on favorited dogs
+- Matched dog shown in a modal with complete details
+
+---
+
+## 🛠️ Tech Stack
+
+- **React** + **TypeScript**
+- **Material UI (MUI)** for styling
+- **React Router** for routing
+- **Google Maps API** (`@react-google-maps/api`)
+- **LocalStorage** for client-side favorites persistence
+- **Fetch API** with `credentials: 'include'` for secure cookie-based auth
+
+---
+
+## 📁 Folder Structure Highlights
+
+```bash
+src/
+├── apis/              // API helper functions
+├── components/        // Reusable UI components (e.g. DogCard, Map)
+├── pages/             // Auth, Search, Favorites pages
+├── store/             // LocalStorage utility for favorites
+├── types/             // Shared TypeScript types
+└── styles/            // Shared styled components
+```
+
+---
+
+## 🦪 Available Scripts
+
+In the project directory, run:
 
 ### `npm start`
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
-
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+Runs the app in development mode at [http://localhost:3000](http://localhost:3000)
 
 ### `npm test`
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+Launches the test runner (Jest) in watch mode.
 
 ### `npm run build`
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+Builds the app for production to the `build` folder.
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+### `npm run deploy`
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+Deploys the app to **GitHub Pages** using the `gh-pages` branch. Requires `homepage` field in `package.json` to be configured.
 
-### `npm run eject`
+---
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+## 🧠 Learnings & Extras
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+- Implemented debounce handling for map bounds updates
+- Styled using both **MUI** and **styled-components** approach for flexibility
+- Followed React and TypeScript best practices with reusable components and hooks
+- Added accessibility-friendly UI enhancements (keyboard tabbing, labels)
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+---
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+## 📦 Deployment
 
-## Learn More
+This app is deployed via **GitHub Pages** using a custom `homepage` config in `package.json`.
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+---
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+## 🐾 Credits
+
+Thanks to Fetch for the fun and thoughtful assignment.  
+Built with care by **Anisha Jain** ✨
