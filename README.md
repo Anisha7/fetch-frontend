@@ -12,6 +12,7 @@ This project is my solution to the [Fetch Frontend Take Home Assignment](https:/
 
 - Login via Name & Email
 - Auth cookie handled securely using `credentials: include`
+- Pure CSS Dog Animation
 
 ### 🐕 Dog Search Page
 
