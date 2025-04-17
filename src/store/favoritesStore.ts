@@ -1,4 +1,4 @@
-// src/utils/favorites.ts
+// src/store/favoritesStore.ts
 
 /**
  * We are using `localStorage` instead of Redux because this is a simple use case

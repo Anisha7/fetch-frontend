@@ -1,24 +1,14 @@
 :root {
     --interval: 200ms;
     --easing: ease-in-out;
-    --dog-color: #2c2c2c;
-    --accent-color: #d2914a;
+    --dog-color: #2f1a1a;
+    --accent-color: #6f4920;
     --eye-color: #ffffff;
     --pupil-color: #000000;
     --tongue-color: #ff6584;
     --gray: #d3d3d3;
     --ear-inner: #6b6b6b;
   }
-  
-  /* body {
-    margin: 0;
-    padding: 0;
-    background: transparent;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-  } */
   
   .dog-container {
     position: relative;
@@ -175,7 +165,7 @@
     border-top-right-radius: 80%;
   }
   
-  .dog-tail {
+  /* .dog-tail {
     position: absolute;
     width: 22px;
     height: 24.2px;
@@ -185,6 +175,57 @@
     border-radius: 11px;
     transform-origin: center bottom;
     animation: dog-tail-wag var(--interval) var(--easing) infinite alternate;
+  } */
+
+  .dog-tail {
+    width: 18px;
+    height: 28px;
+    background: var(--dog-color);
+    position: absolute;
+    bottom: 50%;
+    left: calc(50% - 8px);
+    border-radius: 50% / 40%;
+    transform-origin: center bottom;
+    animation: wag-tail 250ms ease-in-out infinite alternate;
+  }
+
+  .tail-wrapper {
+    position: absolute;
+    bottom: 90%;
+    left: calc(50% - 8px);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    z-index: 0;
+  }
+  
+  .dog-tail .dog-tail {
+    animation-delay: 40ms;
+  }
+  .dog-tail .dog-tail .dog-tail {
+    animation-delay: 80ms;
+  }
+  .dog-tail .dog-tail .dog-tail .dog-tail {
+    animation-delay: 120ms;
+  }
+  
+  @keyframes wag-tail {
+    from {
+      transform: rotate(-20deg);
+    }
+    to {
+      transform: rotate(20deg) ;
+    }
+  }
+  /* Add more delays if needed */
+  
+  @keyframes wag-tail {
+    from {
+      transform: rotate(-20deg);
+    }
+    to {
+      transform: rotate(20deg);
+    }
   }
   
   @keyframes dog-body {
