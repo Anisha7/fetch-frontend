@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Button,
   TextField,
@@ -9,6 +9,7 @@ import { login } from "../../apis/auth";
 import { useNavigate } from "react-router-dom";
 import { styled } from "@mui/material/styles";
 import AnimatedDog from "../dog/AnimatedDog";
+import { searchDogs } from "../../apis/dogs";
 
 // Container for full-screen centered layout
 export const PageContainer = styled(Box)(() => ({
@@ -48,6 +49,9 @@ const Login: React.FC = () => {
   const [email, setEmail] = useState<string>("");
   const [hasError, setHasError] = useState<boolean>(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
+
+  // gh-pages edge case - if user is logged in, redirect to /search
+  // Note: for now, we won't handle the above case due to 404 on /auth/logout endpoint
 
   // Redirects to search page after successful login
   const handleRedirectOnLogin = () => {

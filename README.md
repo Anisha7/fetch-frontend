@@ -37,6 +37,20 @@ This project is my solution to the [Fetch Frontend Take Home Assignment](https:/
 
 ---
 
+## 🔮 Future Improvements (If I Had More Time)
+
+If I had more time, I would refactor state management using the React Context API along with useReducer for better structure and scalability.
+	•	I’d create separate contexts for key state domains:
+	•	AuthContext for managing login/authentication state
+	•	FavoritesContext to replace the current localStorage approach
+	•	SearchContext to handle filters and search results
+	•	I’d use useReducer in each context to ensure predictable state transitions, and wrap the app with these providers so components can access global state using custom hooks like useAuth(), useFavorites(), and useSearch().
+
+This approach would simplify prop management and scale well with future features.
+
+I would also add unit tests for all the files using React Testing Libary.
+
+---
 ## 🛠️ Tech Stack
 
 - **React** + **TypeScript**
