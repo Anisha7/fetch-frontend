@@ -17,11 +17,11 @@ const SearchContainer = styled(Box)(({ theme }) => ({
 // Positioning wrapper for the Generate Match button
 const ButtonContainer = styled(Box)(({ theme }) => ({
   position: 'absolute',
-  right: 20,
+  left: 40,
   zIndex: 1,
   // On smaller screens, float button below navbar
   [theme.breakpoints.down('md')]: {
-    float: 'right',
+    float: 'left',
     top: 130,
   },
 }));

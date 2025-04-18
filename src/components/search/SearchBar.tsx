@@ -107,13 +107,12 @@ const PetSearchBar: React.FC = () => {
               <ScrollableTextField
                 {...params}
                 placeholder="Select breeds"
-                variant="standard"
+                variant="outlined"
               />
             )}
             renderTags={(value, getTagProps) =>
               value.map((option, index) => (
                 <Chip
-                  variant="outlined"
                   label={option}
                   size="small"
                   {...getTagProps({ index })}
