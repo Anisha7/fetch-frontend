@@ -68,7 +68,7 @@ In the project directory, run:
 
 ### `npm start`
 
-Runs the app in development mode at [http://localhost:3000](http://localhost:3000)
+Runs the app in development mode at [http://localhost:3000/fetch-frontend/](http://localhost:3000/fetch-frontend/)
 
 ### `npm test`
 
